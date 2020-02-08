@@ -1,25 +1,75 @@
-import React, {Component} from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { Component } from 'react';
+import { StyleSheet, Text, View, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import PropTypes from 'prop-types';
+import LottieView from 'lottie-react-native';
 
-export default class Weather extends Component {
+const weatherCase = {
+    Rain: {
+        colors: ['#46b5d1', '#32407b'],
+        title: "Rainy Day",
+        subcon: "Take an umbrella with you ☂️",
+        source: require('./Lottie/ShowerIcon.json')
+    },
+    Thunderstorm: {
+        colors: ['#8b4367', '#01024e'],
+        title: "Thunderstom 🌩️",
+        subcon: "Lightning gave me a Harry Potter scar !",
+        source: require('./Lottie/ThunderstormIcon.json')
+    },
+    Drizzle: {
+        colors: ['#d9eeec', '#3c70a4'],
+        title: "Drizzle Day",
+        subcon: "Let's wait until the rain stops.",
+        source: require('./Lottie/ShowerIcon.json')
+    },
+    Snow: {
+        colors: ['#6bc5d2', '#f1c6e7'],
+        title: "Snow Day",
+        subcon: "Do you wanna build a snowman? ☃️",
+        source: require('./Lottie/SnowIcon.json')
+    },
+    Atmosphere: {
+        colors: ['#cccccc', '#9656a1'],
+        title: "Atmosphere Day",
+        subcon: "The fog envelops the earth.",
+        source: require('./Lottie/AtmosphereIcon.json')
+    },
+    Clear: {
+        colors: ['#ffa259', '#ee4540'],
+        title: "Sunny Day ☀️",
+        subcon: "Let's go on a picnic !",
+        source: require('./Lottie/ClearIcon.json')
+    },
+    Clouds: {
+        colors: ['#46b3e6', '#393e46'],
+        title: "Clouds Day",
+        subcon: "The clouds have come up a good deal.",
+        source: require('./Lottie/CloudsIcon.json')
+    }
+}
 
-    render() {
-        return (
-            <LinearGradient colors={['#e4f9ff', '#0fabbc']} style={styles.container}>
+function Weather({ temp, weatherCondition, cityName }) {
+    return (
+        <LinearGradient colors={weatherCase[weatherCondition].colors} style={styles.container}>
                 <View style={styles.upper}>
-                    <Ionicons color='white' size={100} name='ios-rainy' />
+                <LottieView source={weatherCase[weatherCondition].source} style={{width: 180, height: 180}} autoPlay loop/>
                 </View>
                 <View style={styles.lower}>
-                    <Text style={styles.location}>location here</Text>
-                    <Text style={styles.temp}>Temp here</Text>
-                    <Text style={styles.ConTitle}>Contents here</Text>
-                    <Text style={styles.ConSub}>Sub Contents here</Text>
+                    <Text style={styles.location}>{cityName}</Text>
+                    <Text style={styles.tempText}>{temp}℃</Text>
+                    <Text style={styles.ConTitle}>{weatherCase[weatherCondition].title}</Text>
+                    <Text style={styles.ConSub}>{weatherCase[weatherCondition].subcon}</Text>
                 </View>
             </LinearGradient>
-        );
-    }
+    );
+}
+export default Weather;
+
+Weather.propTypes = {
+    temp: PropTypes.number.isRequired,
+    weatherCondition: PropTypes.string.isRequired,
+    cityName: PropTypes.string.isRequired
 }
 
 const styles = StyleSheet.create({
@@ -35,15 +85,16 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'flex-end',
-        marginBottom: 50
+        marginBottom: 70
     },
     location: {
         fontSize: 18,
-        color: 'white'
+        color: 'white',
+        marginBottom: 7
     },
-    temp: {
+    tempText: {
         fontSize: 45,
-        marginBottom: 150,
+        marginBottom: 120,
         backgroundColor: 'transparent',
         color: 'white'
     },
@@ -54,7 +105,7 @@ const styles = StyleSheet.create({
         marginBottom: 12
     },
     ConSub: {
-        fontSize: 25,
+        fontSize: 18,
         backgroundColor: 'transparent',
         color: 'white'
     }
