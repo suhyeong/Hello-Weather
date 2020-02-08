@@ -1,39 +1,84 @@
-import React from 'react';
-import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import React, { Component } from 'react';
+import { StyleSheet, Text, View, ActivityIndicator, StatusBar } from 'react-native';
+import Weather from './Weather';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <View style={styles.redView}>
-        <Text>Hello! this is red view</Text>
+const API_KEY = "eabf8529763c595328cb3bcd661c33d6";
+
+export default class App extends Component {
+
+  state = {
+    isLoaded: false,
+    error: null,
+    temperature: null,
+    weatherCondition: null,
+    cityName: null
+  }
+
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        this._getWeather(position.coords.latitude, position.coords.longitude)
+    },
+    error => {
+      this.setState({
+        error: error
+      });
+    });
+  }
+
+  _getWeather = (lat, lon) => {
+    fetch('http://api.openweathermap.org/data/2.5/weather?lat='+lat+'&lon='+lon+'&appid='+API_KEY)
+    .then(response => response.json())
+    .then(json => {
+      this.setState({
+        temperature: json.main.temp,
+        weatherCondition: json.weather[0].main,
+        cityName: json.name,
+        isLoaded: true
+      });
+    });
+  }
+
+  render() {
+    const { isLoaded, error } = this.state;
+
+    return (
+      <View style={styles.container}>
+        <StatusBar hidden />
+        {isLoaded ? (
+          <Weather />
+        ) : (
+          <View style={styles.loading}>
+            <ActivityIndicator />
+            {error ? (
+              <Text style={styles.errorText}>위치를 불러오는데 문제가 발생했습니다. 😢{'\n'}에러 메세지 : {error}</Text>
+             ) : (
+              <Text style={styles.loadingText}>날씨를 불러오는 중입니다! 조금만 기다려주세요 😊</Text>
+            )}
+          </View>
+        )}
       </View>
-      <View style={styles.yellowView}>
-        <Text>Hello! this is yellow view</Text>
-      </View>
-    </View>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    flexDirection: 'row'
+    justifyContent: 'flex-start',
+    alignItems: 'stretch'
   },
-  redView: {
-    //flex: 1,
-    width: 100,
-    height: 100,
-    backgroundColor: 'red',
+  errorText: {
+    marginTop: 15,
+    textAlign: 'center'
+  },
+  loading: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center'
   },
-  yellowView: {
-    //flex: 6,
-    width: 100,
-    height: 100,
-    backgroundColor: 'yellow',
-    alignItems: 'center',
-    justifyContent: 'center'
+  loadingText: {
+    marginTop: 15
   }
 });
